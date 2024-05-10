@@ -1,0 +1,4 @@
+[2024-05-10T23:29:10.951+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2024-05-10T23:29:10.962+0000] {taskinstance.py:2063} INFO - Dependencies not met for <TaskInstance: process_sales.extract_data_from_api manual__2024-05-06T22:01:10.120021+00:00 [queued]>, dependency 'Execution Date' FAILED: The execution date is 2024-05-06T22:01:10.120021+00:00 but this is after the task's end date 2022-08-11T00:00:00+00:00.
+[2024-05-10T23:29:10.963+0000] {taskinstance.py:2063} INFO - Dependencies not met for <TaskInstance: process_sales.extract_data_from_api manual__2024-05-06T22:01:10.120021+00:00 [queued]>, dependency 'Execution Date' FAILED: The execution date is 2024-05-06T22:01:10.120021+00:00 but this is after the task's DAG's end date 2022-08-11T00:00:00+00:00.
+[2024-05-10T23:29:10.972+0000] {local_task_job_runner.py:163} INFO - Task is not able to be run
