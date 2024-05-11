@@ -22,7 +22,6 @@ def run_job1(**kwargs):
         "date": execution_date,
         "raw_dir": raw_dir
     }
-    print(json_date)
     response = http_hook.run('',json=json_date)
     assert response.status_code == 201
 
@@ -52,7 +51,7 @@ DEFAULT_ARGS = {
 with DAG(
         dag_id='process_sales',
         start_date=datetime(2022, 8, 9),
-        end_date=datetime(2022, 8, 12),
+        end_date=datetime(2022, 8, 13),
         schedule_interval="0 1 * * *",
         max_active_runs=1,
         catchup=True,
