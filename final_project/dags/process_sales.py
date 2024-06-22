@@ -25,11 +25,18 @@ with DAG(
         description="Ingest and process sales data",
         schedule_interval='0 7 * * *',
         start_date=dt.datetime(2022, 9, 1),
-        end_date=dt.datetime(2022, 9, 7),
+        end_date=dt.datetime(2022, 10, 1),
         catchup=True,
         tags=['sales'],
         default_args=DEFAULT_ARGS,
+        max_active_runs=1,
 ) as dag:
+
+    delete_bronze_table_task = BigQueryDeleteTableOperator(
+        task_id="delete_bronze_table",
+        deletion_dataset_table=f'{DATASET_NAME}.bronze.sales',
+        ignore_if_missing=True,
+    )
 
     create_external_table_task = BigQueryCreateExternalTableOperator(
         task_id='create_external_table',
@@ -60,8 +67,4 @@ with DAG(
         }
     )
 
-    delete_bronze_table_task = BigQueryDeleteTableOperator(
-        task_id="delete_bronze_table",
-        deletion_dataset_table=f'{DATASET_NAME}.bronze.sales',
-    )
-    create_external_table_task >> transfer_from_dwh_bronze_to_dwh_silver >> delete_bronze_table_task
+    delete_bronze_table_task >> create_external_table_task >> transfer_from_dwh_bronze_to_dwh_silver

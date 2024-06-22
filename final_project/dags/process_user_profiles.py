@@ -1,5 +1,5 @@
 """
-Sales processing pipeline
+User profiles processing pipeline
 """
 import datetime as dt
 

@@ -7,7 +7,6 @@ from airflow import DAG
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExternalTableOperator, \
     BigQueryInsertJobOperator, BigQueryDeleteTableOperator
 
-
 DATA_LAKE_RAW_BUCKET = 'data_eng-hw_final_project_raw_data_nazar_meliukh'
 DATASET_NAME = 'de-07-nazar-meliukh'
 BUCKET_FILE_NAME = 'customers/{{ dag_run.logical_date.strftime("%Y-%m-%-d") }}/*.csv'
@@ -24,11 +23,18 @@ with DAG(
         description="Ingest and process customers data",
         schedule_interval='0 7 * * *',
         start_date=dt.datetime(2022, 8, 1),
-        end_date=dt.datetime(2022, 8, 7),
+        end_date=dt.datetime(2022, 8, 6),
         catchup=True,
         tags=['customers'],
         default_args=DEFAULT_ARGS,
+        max_active_runs=1,
 ) as dag:
+
+    delete_bronze_table_task = BigQueryDeleteTableOperator(
+        task_id="delete_bronze_table",
+        deletion_dataset_table=f'{DATASET_NAME}.bronze.customers',
+        ignore_if_missing=True,
+    )
 
     create_external_table_task = BigQueryCreateExternalTableOperator(
         task_id='create_external_table',
@@ -46,6 +52,7 @@ with DAG(
         skip_leading_rows=1,
     )
 
+
     transfer_from_dwh_bronze_to_dwh_silver = BigQueryInsertJobOperator(
         task_id='transfer_from_dwh_bronze_to_dwh_silver',
         location='US',
@@ -61,8 +68,4 @@ with DAG(
         }
     )
 
-    delete_bronze_table_task = BigQueryDeleteTableOperator(
-        task_id="delete_bronze_table",
-        deletion_dataset_table=f'{DATASET_NAME}.bronze.customers',
-    )
-    create_external_table_task >> transfer_from_dwh_bronze_to_dwh_silver >> delete_bronze_table_task
+    delete_bronze_table_task >> create_external_table_task >> transfer_from_dwh_bronze_to_dwh_silver
